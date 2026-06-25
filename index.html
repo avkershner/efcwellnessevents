@@ -777,7 +777,13 @@
         event.audiences = normalizeAudiences(parseMulti(clean(row['Who Is It For?'])));
         event.flyerUrls = extractUrls(clean(row['Flyer Link(s)']));
         event.description = clean(row['Description']);
-        event.date = parseDate(event.dateText);
+        event.originalDate = parseDate(event.dateText);
+        event.seriesEnd = parseSeriesEnd(row);
+        event.recurring = isRecurring(event.repeat);
+        // event.date is the date used for sorting, filtering, and the badge.
+        // For recurring events it becomes the NEXT upcoming occurrence so the
+        // event keeps showing while the series is still running.
+        event.date = nextOccurrence(event.originalDate, event.repeat, event.seriesEnd, new Date());
         event.isVirtual = /virtual|online/i.test(event.location + ' ' + event.types.join(' '));
         event.searchText = [
           event.name,
@@ -797,6 +803,66 @@
         if (match) return new Date(Number(match[3]), Number(match[1]) - 1, Number(match[2]));
         const parsed = new Date(value);
         return Number.isNaN(parsed.getTime()) ? null : parsed;
+      }
+
+      // Reads the optional series-end column. "Repeat End Date" is the column
+      // in the sheet; the extra names are fallbacks in case it's renamed later.
+      function parseSeriesEnd(row) {
+        const keys = ['Repeat End Date', 'Repeat Until', 'Repeats Until', 'Series End Date', 'Series End', 'End Date', 'Until'];
+        for (let i = 0; i < keys.length; i++) {
+          const raw = clean(row[keys[i]]);
+          if (raw) {
+            const parsed = parseDate(raw);
+            if (parsed) return parsed;
+          }
+        }
+        return null;
+      }
+
+      function isRecurring(repeat) {
+        const value = String(repeat || '').toLowerCase().trim();
+        return value !== '' && value !== 'none' && value !== 'once' && value !== 'one-time' && value !== 'no' && value !== 'n/a';
+      }
+
+      // Returns the date this event should be treated as occurring on:
+      //  - one-time events: their own date (unchanged behavior)
+      //  - active recurring events: the next occurrence on or after today
+      //  - finished recurring events (past the Repeat End Date): the end date,
+      //    which is in the past, so they correctly drop out of "Upcoming".
+      function nextOccurrence(start, repeat, seriesEnd, today) {
+        if (!start) return null;
+        if (!isRecurring(repeat)) return start;
+
+        const startDay = startOfDay(start);
+        const todayDay = startOfDay(today);
+        const endDay = seriesEnd ? startOfDay(seriesEnd) : null;
+
+        // Series already finished.
+        if (endDay && endDay < todayDay) return endDay;
+        // Hasn't started yet, or starts today.
+        if (startDay >= todayDay) return startDay;
+
+        const value = String(repeat).toLowerCase();
+        let occ = new Date(startDay);
+        let guard = 0;
+
+        if (value.indexOf('month') !== -1) {
+          while (occ < todayDay && guard++ < 600) occ.setMonth(occ.getMonth() + 1);
+        } else if (value.indexOf('year') !== -1 || value.indexOf('annual') !== -1) {
+          while (occ < todayDay && guard++ < 100) occ.setFullYear(occ.getFullYear() + 1);
+        } else {
+          const stepDays = (value.indexOf('biweek') !== -1 || value.indexOf('fortnight') !== -1 || value.indexOf('two week') !== -1) ? 14
+            : (value.indexOf('week') !== -1) ? 7
+            : 1; // default: daily
+          const msPerDay = 86400000;
+          const periods = Math.ceil((todayDay - startDay) / (msPerDay * stepDays));
+          occ = new Date(startDay.getTime() + periods * stepDays * msPerDay);
+          if (occ < todayDay) occ = new Date(occ.getTime() + stepDays * msPerDay);
+        }
+
+        // Next computed occurrence falls after the series end -> series is over.
+        if (endDay && occ > endDay) return endDay;
+        return occ;
       }
 
       function sortByDate(a, b) {
@@ -1008,7 +1074,10 @@
       function formatWhen(event) {
         const date = event.date ? event.date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : event.dateText;
         const time = [event.start, event.end].filter(Boolean).join(' - ');
-        return [date, time].filter(Boolean).join(' · ');
+        const base = [date, time].filter(Boolean).join(' · ');
+        const isFuture = event.date && startOfDay(event.date) >= startOfDay(new Date());
+        const shifted = event.recurring && isFuture && event.originalDate && startOfDay(event.date) > startOfDay(event.originalDate);
+        return shifted ? 'Next: ' + base : base;
       }
 
       function extractUrls(value) {
