@@ -565,7 +565,7 @@
       const SHEET_ID = '1mkZBLqxakdYqwmgkSbR-VoojSpVcJR2MCCWqQEsBNPI';
       const SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit';
       const GVIZ_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?gid=0&tqx=responseHandler:';
-      const REQUIRED_COLUMNS = ['Event Name', 'Date', 'Time Start', 'Time End', 'Repeat Frequency', 'Event Type', 'Host Organization(s)', 'Location', 'Registration Link', 'Who Is It For?', 'Flyer Link(s)', 'Description'];
+      const REQUIRED_COLUMNS = ['Event Name', 'Date', 'Time Start', 'Time End', 'Repeat Frequency', 'Repeat End Date', 'Event Type', 'Host Organization(s)', 'Location', 'Registration Link', 'Who Is It For?', 'Flyer Link(s)', 'Description'];
       const FALLBACK_ROWS = [
         {
           'Event Name': 'Spiritual Support Groups',
@@ -741,6 +741,18 @@
 
       function formatCell(cell) {
         if (!cell) return '';
+        // Google's gviz feed returns a date-only cell's machine value as the
+        // string "Date(YYYY,M,D)" with a ZERO-indexed month. Convert that to a
+        // canonical M/D/YYYY string so date parsing never depends on how the
+        // spreadsheet happens to DISPLAY the date (locale, "May 17, 2026", etc.).
+        // Time-of-day and datetime cells carry extra numbers (hh,mm,ss) or use
+        // the 1899 base year, so they won't match here and keep their display text.
+        if (typeof cell.v === 'string') {
+          const d = cell.v.match(/^Date\((\d+),(\d+),(\d+)\)$/);
+          if (d && Number(d[1]) >= 1900) {
+            return (Number(d[2]) + 1) + '/' + Number(d[3]) + '/' + Number(d[1]);
+          }
+        }
         if (cell.f != null) return String(cell.f).trim();
         if (cell.v == null) return '';
         return String(cell.v).trim();
