@@ -1037,10 +1037,10 @@
               renderDetail('Where', event.location || 'Location not listed') +
               (event.repeat && event.repeat.toLowerCase() !== 'none' ? renderDetail('Repeats', event.repeat) : '') +
             '</div>' +
-            (event.description ? '<p class="description">' + escapeHtml(truncate(event.description, 310)) + '</p>' : '') +
+            (event.description ? '<p class="description">' + escapeHtml(event.description) + '</p>' : '') +
             '<div class="tags">' +
-              event.types.slice(0, 4).map(function (type) { return '<span class="tag">' + escapeHtml(type) + '</span>'; }).join('') +
-              event.audiences.slice(0, 5).map(function (audience) { return '<span class="tag audience">' + escapeHtml(audience) + '</span>'; }).join('') +
+              event.types.map(function (type) { return '<span class="tag">' + escapeHtml(type) + '</span>'; }).join('') +
+              event.audiences.map(function (audience) { return '<span class="tag audience">' + escapeHtml(audience) + '</span>'; }).join('') +
             '</div>' +
             '<div class="actions">' + renderActions(event) + '</div>' +
           '</article>';
