@@ -941,7 +941,7 @@
           const source = kind === 'types' ? event.types : event.audiences;
           source.forEach(function (value) { values.add(value); });
         });
-        return Array.from(values).sort(function (a, b) { return a.localeCompare(b); }).slice(0, kind === 'types' ? 14 : 12);
+        return Array.from(values).sort(function (a, b) { return a.localeCompare(b); });
       }
 
       function buildChips(container, options, activeSet) {
