@@ -135,11 +135,11 @@
     }
     .hero h2 {
       margin: 0;
-      max-width: 13ch;
+      max-width: 20ch;
       color: var(--brand-primary-dark);
-      font-size: clamp(2.1rem, 7vw, 4.75rem);
-      line-height: 0.92;
-      letter-spacing: -0.06em;
+      font-size: clamp(1.95rem, 5.2vw, 3.5rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
     }
     .hero-copy {
       max-width: 42rem;
@@ -157,6 +157,28 @@
     }
     .need-help-panel h3 { margin: 0; color: var(--brand-primary-dark); }
     .need-help-panel p { margin: 0; color: var(--text-secondary); line-height: 1.55; font-size: 0.92rem; }
+    .resource-group h4 {
+      margin: 0 0 0.45rem;
+      color: var(--brand-primary-dark);
+      font-family: 'Chivo', sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+    }
+    .resource-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.65rem;
+    }
+    .resource-list li {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+    .resource-list strong { color: var(--text-primary); }
+    .resource-list a { font-weight: 700; white-space: nowrap; }
+    .resource-note { display: inline-block; margin-top: 0.15rem; font-style: italic; }
     .callout {
       border-left: 4px solid var(--accent-clay);
       padding: 0.8rem 0.9rem;
@@ -477,10 +499,11 @@
     <section class="hero" aria-labelledby="pageTitle">
       <div class="hero-panel">
         <p class="eyebrow">EFC Wellness Committee Events</p>
-        <h2 id="pageTitle">Find support that fits today.</h2>
+        <h2 id="pageTitle">Find wellness events for your healing journey, today.</h2>
         <p class="hero-copy">
           Browse local and online mental health, wellness, recovery, and community care offerings for Eaton Fire recovery. Use the filters to find events by date, audience, type, location, or host.
         </p>
+        <p class="hero-copy"><strong>Event details can change. Please use the registration or flyer links to confirm before attending.</strong></p>
       </div>
       <aside class="need-help-panel" aria-labelledby="urgentHelpTitle">
         <h3 id="urgentHelpTitle">Need immediate help?</h3>
@@ -488,7 +511,25 @@
         <div class="callout">
           For mental health crisis support in the U.S., call or text <strong>988</strong> to reach the Suicide &amp; Crisis Lifeline.
         </div>
-        <p>Event details can change. Please use the registration or flyer links to confirm before attending.</p>
+
+        <div class="resource-group">
+          <h4>Crisis lines</h4>
+          <ul class="resource-list">
+            <li><strong>Crisis Text Line</strong><br>Text &ldquo;HOME&rdquo; to <a href="sms:741741">741-741</a></li>
+            <li><strong>RAINN National Sexual Assault Hotline</strong><br>Call <a href="tel:18006564673">1-800-656-4673</a></li>
+            <li><strong>National Domestic Violence Hotline</strong><br>Call <a href="tel:18007997233">1-800-799-SAFE</a>, text &ldquo;Start&rdquo; to 88788, or chat online<br><span class="resource-note">Support, information, and referrals for survivors of domestic violence and those supporting them.</span></li>
+            <li><strong>The Trevor Project</strong><br>Call <a href="tel:18664887386">1-866-488-7386</a>, text &ldquo;START&rdquo; to 678-678, or chat online<br><span class="resource-note">Crisis support for LGBTQ+ youth aged 13&ndash;24.</span></li>
+          </ul>
+        </div>
+
+        <div class="resource-group">
+          <h4>Warmlines</h4>
+          <ul class="resource-list">
+            <li><strong>SAMHSA&rsquo;s National Helpline</strong><br>Call <a href="tel:18006624357">1-800-662-4357</a><br><span class="resource-note">Referral and information service for individuals and families facing mental and/or substance use disorders.</span></li>
+            <li><strong>California Peer-Run Warmline</strong><br>Call or text <a href="tel:18556009276">1-855-600-9276</a><br><span class="resource-note">Support for yourself, a friend, or a loved one in crisis.</span></li>
+            <li><strong>National Alliance on Mental Illness (NAMI)</strong><br>Call <a href="tel:18009506264">1-800-950-6264</a> or text &ldquo;Helpline&rdquo; to 62640<br><span class="resource-note">One-on-one emotional support, mental health information, and resources to support you or your loved ones.</span></li>
+          </ul>
+        </div>
       </aside>
     </section>
 
